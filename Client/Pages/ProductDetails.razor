@@ -1,0 +1,88 @@
+﻿@page "/ProductDetails/{Id:int}"
+@inject ECommerceApp.Client.Services.IProductsController Products 
+
+<h3>Product Details</h3>
+
+@if(Products.product == null)
+{
+
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    <div class = "col-12">
+
+        <div class = "row">
+
+            <div class = "col-12 text-center">
+
+                <h1>@Products.product.ProductName</h1>
+
+            </div>
+
+        </div>
+
+        <div class = "row">
+
+            <div class = "col-12 text-center">
+
+                @{string ImgSrc = "Content/Images/" + @Products.product.ProductName + ".jpg";}
+
+                <img src = "@ImgSrc">
+
+            </div>
+
+        </div>
+
+        <br>
+
+        <div class = "row">
+
+            <div class = "col-12">
+
+                <p><b><u>Description</u></b></p>
+                <p>@Products.product.Description</p>
+
+            </div>
+
+        </div>
+
+        <br>
+
+        <div class = "row">
+
+            <div class = "col-6">
+
+                
+                <p>Unit Price: R @Products.product.Price</p>
+
+            </div>
+
+            <div class = "col-6">
+
+                <p>In Stock: @Products.product.Quantity</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+        
+
+
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Products.GetProduct(Id);
+
+    } 
+
+}

@@ -1,0 +1,96 @@
+﻿@page "/Registration"
+@using ECommerceApp.Shared
+@using ECommerceApp.Shared.DTO
+@inject ECommerceApp.Client.Services.IUserController Users
+@inject HttpClient client
+
+<PageTitle>Registration Page</PageTitle>
+
+<h3>Registration</h3>
+
+@if (Users.users == null)
+{
+
+    <p><em>Loading...</em></p>
+}
+else
+{
+    
+    <EditForm Model="@userdto" OnSubmit="@Register">
+
+        <div class = "form-group">
+
+            <label for="Username">Username</label>
+            <InputText id="Username" @bind-Value="userdto.Username" class = "form-control"></InputText>
+
+        </div>
+
+        <br>
+
+        <div class = "form-group">
+
+            <label for="Email">Email</label>
+            <InputText id="Email" @bind-Value="userdto.Email" type = "email" class = "form-control"></InputText>
+
+        </div>
+
+        <br>
+
+        <div class = "form-group">
+
+            <label for="Password">Password</label>
+            <InputText id="Password" @bind-Value="userdto.Password" type = "password" class = "form-control"></InputText>
+
+        </div>
+
+        <br>
+
+        <div class = "form-group">
+
+            <label for="ConfirmPassword">ConfirmPassword</label>
+            <InputText id="Password2" @bind-Value = "userdto.ConfirmPassword" type = "password" class = "form-control">weg</InputText>
+
+        </div>
+
+        <br>
+
+        <div>
+
+            <button type = "submit">Submit</button>
+
+        </div>
+
+    </EditForm>
+
+}
+
+
+@code {
+
+    private UserDTO userdto = new UserDTO();
+
+    private User user = new User();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Users.GetUsers();
+
+    }
+
+    private async void Register() {
+
+        if (userdto.Password == userdto.ConfirmPassword) {
+
+
+            user.Username = userdto.Username;
+            user.Email = userdto.Email;
+            user.Password = userdto.Password;
+
+
+            await Users.AddUser(user);
+
+        }
+
+    }
+
+}

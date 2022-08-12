@@ -1,0 +1,63 @@
+﻿@page "/ProductPage"
+@using ECommerceApp.Shared
+@inject ECommerceApp.Client.Services.IProductsController Products
+@inject NavigationManager NavMan
+@inject HttpClient client
+
+<h3>Product Page</h3>
+
+<link href = "css/CardStyle.css" rel = "stylesheet" >
+
+@if (Products.products == null)
+{
+    
+    <p><em>Loading....</em></p>    
+
+}else{
+
+ 
+    <div class = "container">
+
+        <div class = "col-12">
+
+            <div class = "row">
+
+            @foreach(var product in Products.products)
+            {
+
+                    <div class="card">
+
+                        @{string ImgSrc = "Content/Images/" + product.ProductName + ".jpg";}
+
+                        <img src = "@ImgSrc">
+                        <h1 style = "font-size:30px;" @onclick = "() => ShowDetails(product.ProductID)" id = "Product"> @product.ProductName</h1>
+                        <p class="price">R @product.Price</p>
+                        <p><button>Add to Cart</button></p>
+
+                    </div>
+  
+            }
+
+            </div>
+
+        </div>
+
+    </div>
+
+}
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Products.GetProducts();
+
+    }
+
+    void ShowDetails(int Id) {
+
+        NavMan.NavigateTo($"/ProductDetails/{Id}");
+
+    }
+
+}
