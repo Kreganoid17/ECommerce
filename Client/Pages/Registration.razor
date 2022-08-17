@@ -2,7 +2,11 @@
 @using ECommerceApp.Shared
 @using ECommerceApp.Shared.DTO
 @inject ECommerceApp.Client.Services.IUserController Users
+@inject NavigationManager NavMan
 @inject HttpClient client
+@inject IToastService ToastService
+
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
 
 <PageTitle>Registration Page</PageTitle>
 
@@ -16,7 +20,7 @@
 else
 {
     
-    <EditForm Model="@userdto" OnSubmit="@Register">
+    <EditForm Model="@userdto" OnSubmit="Register">
 
         <div class = "form-group">
 
@@ -73,21 +77,24 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+
         await Users.GetUsers();
 
     }
 
-    private async void Register() {
+    private async Task Register() {
 
         if (userdto.Password == userdto.ConfirmPassword) {
-
 
             user.Username = userdto.Username;
             user.Email = userdto.Email;
             user.Password = userdto.Password;
 
-
             await Users.AddUser(user);
+
+            NavMan.NavigateTo("/Login");
+
+            ToastService.ShowSuccess("Registered Successfully");
 
         }
 

@@ -18,17 +18,37 @@ namespace ECommerceApp.Client.Repositories
 
         public async Task GetProducts()
         {
-            var Products = await _client.GetFromJsonAsync<List<Product>>("api/Products");
+            try
+            {
 
-            products = Products;
+                var Products = await _client.GetFromJsonAsync<List<Product>>("api/Products");
+
+                products = Products;
+
+            }
+            catch (Exception ex) { 
+            
+                throw new Exception(ex.Message);
+            
+            }
 
         }
 
         public async Task GetProduct(int Id)
         {
-            var Product = await _client.GetFromJsonAsync<Product>($"api/Products/{Id}");
+            try
+            {
 
-            product = Product;
+                var Product = await _client.GetFromJsonAsync<Product>($"api/Products/{Id}");
+
+                product = Product;
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
 
         }
 

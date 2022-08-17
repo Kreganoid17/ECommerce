@@ -1,5 +1,7 @@
 ﻿@page "/ProductDetails/{Id:int}"
+@using ECommerceApp.Shared
 @inject ECommerceApp.Client.Services.IProductsController Products 
+@inject ILocalStorageService LocalStorage
 
 <h3>Product Details</h3>
 
@@ -83,6 +85,7 @@ else
     {
         await Products.GetProduct(Id);
 
-    } 
+    }
 
 }
+

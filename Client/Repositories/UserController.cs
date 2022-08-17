@@ -17,19 +17,37 @@ namespace ECommerceApp.Client.Repositories
 
         public async Task AddUser(User user)
         {
-            await _client.PostAsJsonAsync("api/AddUser/", user);
+            try
+            {
+
+                await _client.PostAsJsonAsync("api/AddUser/", user);
+
+            }
+            catch (Exception ex) { 
+            
+                throw new Exception(ex.Message);
+            
+            }
         }
 
         public async Task GetUsers()
         {
 
-            var Users = await _client.GetFromJsonAsync<List<User>>("api/AddUser");
+            try
+            {
 
-            users = Users;
+                var Users = await _client.GetFromJsonAsync<List<User>>("api/AddUser");
+
+                users = Users;
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
 
         }
-
-        
 
     }
 }

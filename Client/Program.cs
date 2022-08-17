@@ -1,3 +1,5 @@
+using Blazored.LocalStorage;
+using Blazored.Toast;
 using ECommerceApp.Client;
 using ECommerceApp.Client.Repositories;
 using ECommerceApp.Client.Services;
@@ -11,10 +13,15 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-builder.Services.AddScoped<AuthenticationStateProvider, AuthenticationProvider>();
-builder.Services.AddAuthenticationCore();
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazoredToast();
 
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddScoped<IUserController, UserController>();
 builder.Services.AddScoped<IProductsController, ProductController>();
+builder.Services.AddScoped<ILoginUserController, LoginUserController>();
 
 await builder.Build().RunAsync();

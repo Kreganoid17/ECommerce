@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthStateProvider
+
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">ECommerceApp</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -25,14 +29,44 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Registration">
-                <span class="oi oi-people" aria-hidden="true"></span> Register
-            </NavLink>
+            <AuthorizeView>
+
+                <NotAuthorized>
+
+                    <NavLink class="nav-link" href="Registration">
+                        <span class="oi oi-people" aria-hidden="true"></span> Register
+                    </NavLink>
+
+                </NotAuthorized>
+
+            </AuthorizeView>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="ProductPage">
                 <span class="oi oi-book" aria-hidden="true"></span> Products
             </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <AuthorizeView>
+
+                <NotAuthorized>
+
+                    <NavLink class="nav-link" href="Login">
+                        <span class="oi oi-account-login" aria-hidden="true"></span> Login
+                    </NavLink>
+
+                </NotAuthorized>
+
+                <Authorized>
+
+                    <NavLink class="nav-link" @onclick="LogOut" href="login">
+                        <span class="oi oi-account-logout" aria-hidden="true" ></span> Log Out
+                    </NavLink>
+
+                </Authorized>
+
+            </AuthorizeView>
+
         </div>
     </nav>
 </div>
@@ -46,4 +80,15 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
+    private async void LogOut()
+    {
+
+        await LocalStorage.RemoveItemAsync("User");
+        await AuthStateProvider.GetAuthenticationStateAsync();
+
+    }
+
 }
+
+

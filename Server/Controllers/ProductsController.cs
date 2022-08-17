@@ -19,9 +19,19 @@ namespace ECommerceApp.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetProducts() {
 
-            var Products = await _products.GetProducts();
+            try
+            {
 
-            return Products;
+                var Products = await _products.GetProducts();
+
+                return Products;
+
+            }
+            catch (Exception ex) { 
+            
+                throw new Exception(ex.Message);
+
+            }
         
         }
 
@@ -29,9 +39,19 @@ namespace ECommerceApp.Server.Controllers
         public async Task<ActionResult<Product>> GetProduct(int Id)
         {
 
-            var Products = await _products.GetProduct(Id);
+            try
+            {
 
-            return Products;
+                var Products = await _products.GetProduct(Id);
+
+                return Products;
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
 
         }
 

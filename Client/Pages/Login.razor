@@ -1,0 +1,78 @@
+﻿@page "/Login"
+@using ECommerceApp.Shared
+@using ECommerceApp.Shared.DTO
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavMan
+@inject ECommerceApp.Client.Services.ILoginUserController LoginUserController
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IToastService ToastService
+@inject HttpClient client
+
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
+
+<h3>Login</h3>
+
+<EditForm Model="@login" OnSubmit="LoginUser">
+
+    <label for = "Login">Login</label>
+
+    <div class = "form-group">
+
+        <label for="Email">Email</label>
+        <InputText id="Email" @bind-Value="login.Email" type = "email" class = "form-control"></InputText>
+
+    </div>
+
+    <div class = "form-group">
+
+        <label for="Password">Password</label>
+        <InputText id="Password" @bind-Value="login.Password" type = "password" class = "form-control"></InputText>
+    </div>
+
+    <button type = "submit">Login</button>
+
+</EditForm>
+
+@code {
+    private LoginDTO login = new LoginDTO();
+
+
+    private async void LoginUser()
+    {
+
+        if (login.Email == null)
+        {
+
+            ToastService.ShowError("Please Fill In Email Field");
+
+        }else if (login.Password == null) {
+
+
+            ToastService.ShowError("Please Fill In Password Field");
+
+        }else{
+
+            await LoginUserController.IsValidUser(login);
+
+            var isvalid = LoginUserController.IsValid;
+
+            if (isvalid == true)
+            {
+
+                await AuthStateProvider.GetAuthenticationStateAsync();
+
+                NavMan.NavigateTo("/ProductPage");
+
+            }
+            else
+            {
+                
+                ToastService.ShowError("Invalid User");
+
+            }
+
+        }
+
+    }
+
+}

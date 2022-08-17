@@ -19,24 +19,44 @@ namespace ECommerceApp.Server.Repositories
 
         public async Task AddUser(User user)
         {
-            
-            _context.Users.Add(user);
 
-            await _context.SaveChangesAsync();
+            try
+            {
+
+                _context.Users.Add(user);
+
+                await _context.SaveChangesAsync();
+
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+
+           
+            
+            }
 
         }
 
         public async Task<List<User>> GetUsers()
         {
-            var Users = await _context.Users.ToListAsync();
+            try
+            {
 
-            users = Users;
+                var Users = await _context.Users.ToListAsync();
 
-            return users;
+                users = Users;
+
+                return users;
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+
+            }
         }
-
-        
-
 
     }
 }

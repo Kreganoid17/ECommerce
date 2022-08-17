@@ -20,20 +20,40 @@ namespace ECommerceApp.Server.Repositories
 
         public async Task<Product> GetProduct(int Id)
         {
-            var Product = await _context.Products.FindAsync(Id);
+            try
+            {
 
-            product = Product;
+                var Product = await _context.Products.FindAsync(Id);
 
-            return product;
+                product = Product;
+
+                return product;
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
         }
 
         public async Task<List<Product>> GetProducts()
         {
-            var Products = await _context.Products.ToListAsync();
+            try
+            {
 
-            products = Products;
+                var Products = await _context.Products.ToListAsync();
 
-            return products;
+                products = Products;
+
+                return products;
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
         }
 
     }

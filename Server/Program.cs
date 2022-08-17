@@ -17,6 +17,7 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(build
 
 builder.Services.AddScoped<IUsers, Users>();
 builder.Services.AddScoped<IProducts, Products>();
+builder.Services.AddScoped<ILoginUser, LoginUser>();
 
 
 var app = builder.Build();

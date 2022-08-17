@@ -22,14 +22,34 @@ namespace ECommerceApp.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<List<User>>> GetUsers() {
 
-            return await _Iuser.GetUsers();
+            try
+            {
+
+                return await _Iuser.GetUsers();
+
+            }
+            catch (Exception ex) { 
+            
+                throw new Exception(ex.Message);
+            
+            }
         
         }
 
         [HttpPost]
         public async Task AddUser(User user) {
 
-            await _Iuser.AddUser(user);
+            try
+            {
+
+                await _Iuser.AddUser(user);
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
         
         }
 
