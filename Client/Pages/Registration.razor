@@ -7,6 +7,7 @@
 @inject IToastService ToastService
 
 <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
+<link href="css/Loading.css" rel="stylesheet" />
 
 <PageTitle>Registration Page</PageTitle>
 
@@ -15,17 +16,30 @@
 @if (Users.users == null)
 {
 
-    <p><em>Loading...</em></p>
+    <div id="circle">
+                <div class="loader">
+                    <div class="loader">
+                        <div class="loader">
+                            <div class="loader">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
 }
 else
 {
     
-    <EditForm Model="@userdto" OnSubmit="Register">
+    <EditForm Model="@userdto" OnValidSubmit="Register">
+
+        <DataAnnotationsValidator/>
 
         <div class = "form-group">
 
             <label for="Username">Username</label>
             <InputText id="Username" @bind-Value="userdto.Username" class = "form-control"></InputText>
+            <ValidationMessage For = "() => userdto.Username" />
 
         </div>
 
@@ -35,6 +49,7 @@ else
 
             <label for="Email">Email</label>
             <InputText id="Email" @bind-Value="userdto.Email" type = "email" class = "form-control"></InputText>
+            <ValidationMessage For = "() => userdto.Email" />
 
         </div>
 
@@ -44,6 +59,7 @@ else
 
             <label for="Password">Password</label>
             <InputText id="Password" @bind-Value="userdto.Password" type = "password" class = "form-control"></InputText>
+            <ValidationMessage For = "() => userdto.Password" />
 
         </div>
 
@@ -53,6 +69,7 @@ else
 
             <label for="ConfirmPassword">ConfirmPassword</label>
             <InputText id="Password2" @bind-Value = "userdto.ConfirmPassword" type = "password" class = "form-control">weg</InputText>
+            <ValidationMessage For = "() => userdto.ConfirmPassword" />
 
         </div>
 
@@ -60,7 +77,7 @@ else
 
         <div>
 
-            <button type = "submit">Submit</button>
+            <button type = "submit" class = "btn btn-primary">Submit</button>
 
         </div>
 
@@ -84,18 +101,20 @@ else
 
     private async Task Register() {
 
-        if (userdto.Password == userdto.ConfirmPassword) {
+        await Users.AddUser(userdto);
 
-            user.Username = userdto.Username;
-            user.Email = userdto.Email;
-            user.Password = userdto.Password;
+        if (Users.UserExists == true)
+        {
 
-            await Users.AddUser(user);
+            ToastService.ShowError("User With This Email Already Exists");
 
+        }
+        else if (Users.UserExists == false) { 
+        
             NavMan.NavigateTo("/Login");
 
             ToastService.ShowSuccess("Registered Successfully");
-
+        
         }
 
     }

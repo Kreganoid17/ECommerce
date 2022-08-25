@@ -18,6 +18,8 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(build
 builder.Services.AddScoped<IUsers, Users>();
 builder.Services.AddScoped<IProducts, Products>();
 builder.Services.AddScoped<ILoginUser, LoginUser>();
+builder.Services.AddScoped<ICart, CartFunctions>();
+builder.Services.AddScoped<IMail, Mail>();
 
 
 var app = builder.Build();

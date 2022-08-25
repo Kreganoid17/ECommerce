@@ -16,14 +16,17 @@ namespace ECommerceApp.Client
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
 
-            var state = new AuthenticationState(new ClaimsPrincipal());
-
-            string username = await _localstorage.GetItemAsStringAsync("User");
-
-            if (!string.IsNullOrEmpty(username))
+            try
             {
 
-                var claimsprincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
+                var state = new AuthenticationState(new ClaimsPrincipal());
+
+                string username = await _localstorage.GetItemAsStringAsync("User");
+
+                if (!string.IsNullOrEmpty(username))
+                {
+
+                    var claimsprincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
 
                     {
 
@@ -31,16 +34,23 @@ namespace ECommerceApp.Client
 
                     }, "test authentication"
 
-                    ));
+                        ));
 
-                state = new AuthenticationState(claimsprincipal);
+                    state = new AuthenticationState(claimsprincipal);
 
+
+                }
+
+                NotifyAuthenticationStateChanged(Task.FromResult(state));
+
+                return await Task.FromResult(state);
 
             }
+            catch (Exception ex) {
 
-            NotifyAuthenticationStateChanged(Task.FromResult(state));
-
-            return await Task.FromResult(state);
+                throw new Exception(ex.Message);
+            
+            }
 
         }
     }

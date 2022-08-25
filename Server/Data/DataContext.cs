@@ -21,5 +21,10 @@ namespace ECommerceApp.Shared
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Cart> cart { get; set; }
+
+        public DbSet<Order> orders { get; set; }
+
+
     }
 }

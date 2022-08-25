@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 
 namespace ECommerceApp.Shared.DTO
 {
-    public class AuthDTO
+    public class CartDTO
     {
+        public int ProductID { get; set; }
 
-        public string Username { get; set; }
+        public string ProductName { get; set; }
+
+        public int Quantity { get; set; }
+
+        public float Price { get; set; }
+
         public int UserID { get; set; }
-        public string Token { get; set; }
 
     }
 }

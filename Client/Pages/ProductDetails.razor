@@ -1,14 +1,33 @@
 ﻿@page "/ProductDetails/{Id:int}"
 @using ECommerceApp.Shared
+@using ECommerceApp.Shared.DTO
 @inject ECommerceApp.Client.Services.IProductsController Products 
+@inject ECommerceApp.Client.Services.ICartController Cart
+@inject IToastService ToastService
+@inject NavigationManager NavMan
 @inject ILocalStorageService LocalStorage
 
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
+<link href="css/Loading.css" rel="stylesheet" />
+
 <h3>Product Details</h3>
+
 
 @if(Products.product == null)
 {
 
-    <p><em>Loading...</em></p>
+    <div id="circle">
+                <div class="loader">
+                    <div class="loader">
+                        <div class="loader">
+                            <div class="loader">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>   
+
 }
 else
 {
@@ -72,6 +91,28 @@ else
     </div>
 
         
+<div>
+
+    <button @onclick = "() => Back()" class= "btn btn-primary">Back</button>
+
+</div>
+
+<AuthorizeView>
+
+    <Authorized>
+
+        <br>
+
+        <div>
+
+            <button @onclick = "() => AddToCart(Products.product)" class = "btn btn-primary">Add To Cart</button>
+
+        </div>
+
+    </Authorized>
+
+</AuthorizeView>
+
 
 
 }
@@ -81,9 +122,35 @@ else
     [Parameter]
     public int Id { get; set; }
 
+
+
     protected override async Task OnInitializedAsync()
     {
+
         await Products.GetProduct(Id);
+
+    }
+
+    private void Back() {
+
+        NavMan.NavigateTo("/ProductPage");
+
+    }
+
+    private void AddToCart(Product product)
+    {
+
+        Cart.AddToCart(product);
+
+        ToastService.ShowSuccess(product.ProductName + " Has Been Added", "Added To Cart");
+
+    }
+
+    private async void AddCartToDB() {
+
+        var listcart = await LocalStorage.GetItemAsync<List<CartDTO>>("cart");
+
+        await Cart.AddCartToDB(listcart);
 
     }
 

@@ -1,4 +1,5 @@
 ﻿using ECommerceApp.Shared;
+using ECommerceApp.Shared.DTO;
 
 namespace ECommerceApp.Server.Services
 {
@@ -7,9 +8,11 @@ namespace ECommerceApp.Server.Services
 
         List<User> users { get; set; }
 
+        bool Exists { get; set; }
+
         public Task<List<User>> GetUsers();
 
-        public Task AddUser(User user);
+        public Task AddUser(UserDTO user);
 
     }
 }

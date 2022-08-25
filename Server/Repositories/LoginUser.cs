@@ -3,6 +3,7 @@ using ECommerceApp.Server.Services;
 using ECommerceApp.Shared;
 using ECommerceApp.Shared.DTO;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace ECommerceApp.Server.Repositories
 {
@@ -22,7 +23,7 @@ namespace ECommerceApp.Server.Repositories
             try
             {
 
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == login.Email && x.Password == login.Password);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == login.Email);
 
                 if (user == null)
                 {
@@ -33,7 +34,20 @@ namespace ECommerceApp.Server.Repositories
                 else
                 {
 
-                    return true;
+                    if (!VerifyPasswordHash(login.Password, user.PasswordHash, user.PasswordSalt))
+                    {
+
+                        return false;
+
+                    }
+                    else if(VerifyPasswordHash(login.Password, user.PasswordHash, user.PasswordSalt))
+                    {
+
+                        return true;
+
+                    }
+
+                    return false;
 
                 }
 
@@ -47,16 +61,30 @@ namespace ECommerceApp.Server.Repositories
             }
         }
 
+        private bool VerifyPasswordHash(string password, byte[] passwordhash, byte[] passwordsalt)
+        {
+
+            using (var hmac = new HMACSHA512(passwordsalt))
+            {
+
+                var computedhash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedhash.SequenceEqual(passwordhash);
+
+            }
+
+        }
+
         public async Task<AuthDTO> SetUser(LoginDTO login) {
 
             try
             {
 
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == login.Email && x.Password == login.Password);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == login.Email);
 
                 AuthDTO authdto = new AuthDTO();
 
                 authdto.Username = user.Username;
+                authdto.UserID = user.ID;
                 authdto.Token = "Some Secret Token";
 
                 return authdto;

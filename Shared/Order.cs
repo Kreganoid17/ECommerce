@@ -7,19 +7,20 @@ using System.Threading.Tasks;
 
 namespace ECommerceApp.Shared
 {
-    public class User
+    public class Order
     {
 
         [Key]
         public int ID { get; set; }
+        public User Userid { get; set; }
 
-        public string Email { get; set; }
+        public string Products { get; set; }
 
-        public byte[] PasswordHash { get; set; }
+        public string Quantities { get; set; }
 
-        public byte[] PasswordSalt { get; set; }
+        public string Prices { get; set; }
 
-        public string Username { get; set; }
+        public DateTime date { get; set; }
 
     }
 }

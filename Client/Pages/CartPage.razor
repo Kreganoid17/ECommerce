@@ -1,0 +1,199 @@
+﻿@page "/Cart"
+@using ECommerceApp.Shared
+@using ECommerceApp.Shared.DTO
+@using System.Linq
+@inject ECommerceApp.Client.Services.ICartController CartController
+@inject ECommerceApp.Client.Services.IMailController MailController
+@inject IToastService ToastService
+@inject ILocalStorageService LocalStorage
+
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
+<link href="css/InputStyle.css" rel="stylesheet" />
+<link href="css/Loading.css" rel="stylesheet" />
+
+<h3>Your Cart</h3>
+
+<div>
+
+    @if (CartController.CartItems == null) {
+
+           <div id="circle">
+                <div class="loader">
+                    <div class="loader">
+                        <div class="loader">
+                            <div class="loader">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>   
+
+    }
+    else
+    {
+
+        if (CartController.CartItems.Count > 0)
+        {
+        @foreach (var cartitem in CartItems)
+        {
+        
+            string ImgSrc = "Content/Images/" + cartitem.ProductName + ".jpg";
+
+            <div class = "col-12">
+
+                <div class = "row">
+
+                    <div class = "col-3">
+
+                        <img src = "@ImgSrc" id = "ProductImg">
+
+                    </div>
+
+                    <div class = "col float-start">
+
+                        <h1 style = "font-size:30px;" id = "Product"> @cartitem.ProductName</h1>
+                        <p class="price">Unit Price : R @cartitem.Price</p>
+
+                        <EditForm Model = "cartitem">
+
+                            <input id="Quantity" type="number" min = "1" @bind-value = "cartitem.Quantity">
+
+                        </EditForm>
+
+                        <br>
+                        <br>
+                        <button class = "btn btn-primary" id = "Remove" @onclick = "() => RemoveFromCart(cartitem)">Remove</button>
+
+                    </div>
+
+                    <div class = "col">
+
+                        <div class = "float-end px-4">
+
+                            <b>Price : R @(cartitem.Price * cartitem.Quantity)</b>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <br>
+
+            </div>
+
+        }
+
+        
+
+        <br>
+
+        
+            <div class = "col-12">
+
+                <div class = "row float-end px-4">
+
+                    <div>
+
+                        @{
+                            float total = 0;
+                            total = total + CartItems.Sum(x => x.Price * x.Quantity);
+                        }
+
+                        <b>Total (@CartItems.Count) : R @total</b>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <br>
+            <br>
+
+            <div class = "col-12">
+
+                <div class = "row">
+
+                    <div class = "text-center">
+
+                        <button class = "btn btn-primary w-25 mb-4" style = "background-color:forestgreen;" @onclick = "() => SendEmail()">Checkout</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+        else if(CartController.CartItems.Count == 0){ 
+        
+            <p>No Items In Cart</p>
+        
+        }
+
+    }
+
+    
+
+</div>
+
+@code {
+
+    List<Product> CartItems = new List<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var cartitems = await LocalStorage.GetItemAsync<List<CartDTO>>("cart");
+
+        await CartController.PopulateCart(cartitems);
+
+        CartItems = CartController.CartItems;
+
+    }
+
+    private async Task RemoveFromCart(Product cartdto) {
+
+        await CartController.RemoveFromCart(cartdto);
+
+        var cartitems = await LocalStorage.GetItemAsync<List<CartDTO>>("cart");
+
+        await CartController.PopulateCart(cartitems);
+
+        CartItems = CartController.CartItems;
+
+    }
+
+    private async Task SendEmail() {
+
+        List<CartDTO> cartdto = new List<CartDTO>();
+
+        var userId = await LocalStorage.GetItemAsync<AuthDTO>("User");
+
+        int userid = userId.UserID;
+
+        foreach (var product in CartItems)
+        {
+
+            CartDTO cartDTO = new CartDTO();
+
+            cartDTO.ProductID = product.ProductID;
+            cartDTO.ProductName = product.ProductName;
+            cartDTO.Quantity = product.Quantity;
+            cartDTO.Price = product.Price;
+            cartDTO.UserID = userid;
+
+            cartdto.Add(cartDTO);
+
+        }
+
+        await MailController.SendMail(cartdto);
+
+        List<CartDTO> CartDTO = new List<CartDTO>();
+
+        await LocalStorage.SetItemAsync("cart", CartDTO);
+
+        ToastService.ShowSuccess("Email Sent");
+
+    }
+}

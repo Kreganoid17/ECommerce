@@ -36,7 +36,7 @@ namespace ECommerceApp.Server.Controllers
         }
 
         [HttpGet("{Id}")]
-        public async Task<ActionResult<Product>> GetProduct(int Id)
+        public async Task<Product> GetProduct(int Id)
         {
 
             try

@@ -1,5 +1,6 @@
 ﻿using ECommerceApp.Client.Services;
 using ECommerceApp.Shared;
+using ECommerceApp.Shared.DTO;
 using System.Net.Http.Json;
 
 namespace ECommerceApp.Client.Repositories
@@ -14,13 +15,17 @@ namespace ECommerceApp.Client.Repositories
         }
 
         public List<User> users { get; set; }
+        public bool UserExists { get; set; }
 
-        public async Task AddUser(User user)
+        public async Task AddUser(UserDTO user)
         {
             try
             {
 
-                await _client.PostAsJsonAsync("api/AddUser/", user);
+                var call = await _client.PostAsJsonAsync("api/AddUser/", user);
+                var Exists = await call.Content.ReadFromJsonAsync<bool>();
+
+                UserExists = Exists;
 
             }
             catch (Exception ex) { 

@@ -23,5 +23,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>
 builder.Services.AddScoped<IUserController, UserController>();
 builder.Services.AddScoped<IProductsController, ProductController>();
 builder.Services.AddScoped<ILoginUserController, LoginUserController>();
+builder.Services.AddScoped<ICartController, CartController>();
+builder.Services.AddScoped<IMailController, MailController>();
 
 await builder.Build().RunAsync();

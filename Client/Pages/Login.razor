@@ -12,24 +12,31 @@
 
 <h3>Login</h3>
 
-<EditForm Model="@login" OnSubmit="LoginUser">
+<EditForm Model="@login" OnValidSubmit="LoginUser">
 
-    <label for = "Login">Login</label>
+    <DataAnnotationsValidator/>
 
     <div class = "form-group">
 
         <label for="Email">Email</label>
         <InputText id="Email" @bind-Value="login.Email" type = "email" class = "form-control"></InputText>
+        <ValidationMessage For = "() => login.Email" />
 
     </div>
+
+    <br>
 
     <div class = "form-group">
 
         <label for="Password">Password</label>
         <InputText id="Password" @bind-Value="login.Password" type = "password" class = "form-control"></InputText>
+        <ValidationMessage For = "() => login.Password" />
+
     </div>
 
-    <button type = "submit">Login</button>
+    <br>
+
+    <button type = "submit" class = "btn btn-primary">Login</button>
 
 </EditForm>
 
@@ -40,39 +47,29 @@
     private async void LoginUser()
     {
 
-        if (login.Email == null)
+        await LoginUserController.IsValidUser(login);
+
+        var isvalid = LoginUserController.IsValid;
+
+        if (isvalid == true)
         {
 
-            ToastService.ShowError("Please Fill In Email Field");
+            await AuthStateProvider.GetAuthenticationStateAsync();
 
-        }else if (login.Password == null) {
+            NavMan.NavigateTo("/ProductPage");
 
+            await LocalStorage.SetItemAsync("cart", new List<CartDTO>());
 
-            ToastService.ShowError("Please Fill In Password Field");
-
-        }else{
-
-            await LoginUserController.IsValidUser(login);
-
-            var isvalid = LoginUserController.IsValid;
-
-            if (isvalid == true)
-            {
-
-                await AuthStateProvider.GetAuthenticationStateAsync();
-
-                NavMan.NavigateTo("/ProductPage");
-
-            }
-            else
-            {
+        }
+        else if(isvalid == false)
+        {
                 
-                ToastService.ShowError("Invalid User");
+            ToastService.ShowError("Invalid User");
 
-            }
+        }
 
         }
 
     }
 
-}
+

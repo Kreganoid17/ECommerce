@@ -1,6 +1,7 @@
 ﻿using ECommerceApp.Client.Services;
 using ECommerceApp.Server.Services;
 using ECommerceApp.Shared;
+using ECommerceApp.Shared.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,12 +38,14 @@ namespace ECommerceApp.Server.Controllers
         }
 
         [HttpPost]
-        public async Task AddUser(User user) {
+        public async Task<bool> AddUser(UserDTO user) {
 
             try
             {
 
                 await _Iuser.AddUser(user);
+
+                return _Iuser.Exists;
 
             }
             catch (Exception ex) {

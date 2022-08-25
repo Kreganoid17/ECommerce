@@ -22,28 +22,49 @@ namespace ECommerceApp.Client.Repositories
         public async Task IsValidUser(LoginDTO login)
         {
 
-            var call = await _client.PostAsJsonAsync("api/LoginUser", login);
-            var authdto = await call.Content.ReadFromJsonAsync<AuthDTO>();
-
-            if (authdto.Username != null && authdto.Token != null)
+            try
             {
 
-                await LoginUser(authdto);
-                IsValid = true;
+                var call = await _client.PostAsJsonAsync("api/LoginUser", login);
+                var authdto = await call.Content.ReadFromJsonAsync<AuthDTO>();
+
+                if (authdto.Username != null && authdto.Token != null)
+                {
+
+                    await LoginUser(authdto);
+                    IsValid = true;
+
+                }
+                else
+                {
+
+
+                    IsValid = false;
+
+                }
 
             }
-            else {
+            catch (Exception ex) {
 
-
-                IsValid = false;
-
+                throw new Exception(ex.Message);
+            
             }
  
         }
 
         private async Task LoginUser(AuthDTO authdto) {
 
-            await _localstorage.SetItemAsync("User", authdto);
+            try
+            {
+
+                await _localstorage.SetItemAsync("User", authdto);
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
 
         }
     }
