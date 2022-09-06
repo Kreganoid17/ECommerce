@@ -46,7 +46,7 @@ namespace ECommerceApp.Server.Repositories
 
                 string textbody = "<head><style> td { text-align:center; }</style ></head> ";
 
-                textbody += " <table border=" + 1 + " cellpadding=" + 0 + " cellspacing=" + 0 + " width = " + 600 + "><thead><tr bgcolor='#4da6ff'><th><b>Name</b></th> <th> <b> Quantity</b> </th><th> <b> Price</b> </th></tr><thead>";
+                textbody += " <table border=" + 1 + " cellpadding=" + 0 + " cellspacing=" + 0 + " width = " + 600 + "><thead><tr bgcolor='#4da6ff'><th><b>Name</b></th> <th> <b> Quantity</b> </th><th> <b>Total Price</b> </th></tr><thead>";
 
                 for (int i = 0; i < cartdto.Count; i++)
                 {

@@ -15,19 +15,19 @@
 
     <main>
 
-        <div class = "col-12">
+        <div class = "col">
 
-            <div class = "row">
+            <div class = "row w-100">
 
             <AuthorizeView>
 
                 <Authorized>
 
-                    <div class="col-10 p-2" >
+                    <div class="col-10 p-2 mx-5">
 
                     @{AuthDTO username = LocalStorage.GetItem<AuthDTO>("User");}
 
-                    <div class = "text-center">
+                    <div class = "text-center" style = "margin-left:200px;">
 
                         <h1>Welcome Back @username.Username To The Gaming Corner!</h1>
 
@@ -37,11 +37,11 @@
 
                     <div class="col">
 
-                    <div class = "p-2">
+                    <div class = "p-2 mx-2">
 
                     <button class = "btn btn-primary p-2" @onclick = "GoToCartPage">
                         
-                        <i class = "oi oi-cart mx-1"></i> Cart
+                        <i class = "oi oi-cart mx-2"></i> Cart
 
                         <span class = "badge badge-pill badge-light mx-1">@GetCartCount()</span>
                     
@@ -55,11 +55,11 @@
 
                 <NotAuthorized>
 
-                    <div class="col p-2">
+                    <div class="col-12 p-2">
 
                     <div class = "text-center">
 
-                        <h1>Welcome To The Shop!</h1>
+                        <h1>Welcome To The Gaming Corner!</h1>
 
                     </div>
                     

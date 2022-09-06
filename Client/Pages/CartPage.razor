@@ -186,6 +186,8 @@
 
     private async Task SendEmail() {
 
+        ToastService.ShowInfo("Processing Order","Processing");
+
         List<CartDTO> cartdto = new List<CartDTO>();
 
         var userId = await LocalStorage.GetItemAsync<AuthDTO>("User");
