@@ -5,7 +5,7 @@
 @inject ECommerceApp.Client.Services.ICartController Cart
 @inject IToastService ToastService
 @inject NavigationManager NavMan
-@inject ILocalStorageService LocalStorage
+@inject ISyncLocalStorageService LocalStorage
 
 <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
 <link href="css/Loading.css" rel="stylesheet" />
@@ -82,7 +82,20 @@ else
 
             <div class = "col-6">
 
-                <p>In Stock: @Products.product.Quantity</p>
+                @if(Products.product.Quantity > 0)
+                {
+                    
+                    <p>In Stock: @Products.product.Quantity</p>
+
+                    
+
+
+                }else if(Products.product.Quantity <= 0)
+                {
+                    
+                     <p>Out of Stock</p>
+
+                }
 
             </div>
 
@@ -90,12 +103,15 @@ else
 
     </div>
 
+<div class = "row">
         
-<div>
+<div class = "col-6">
 
     <button @onclick = "() => Back()" class= "btn btn-primary">Back</button>
 
 </div>
+
+
 
 <AuthorizeView>
 
@@ -103,9 +119,35 @@ else
 
         <br>
 
-        <div>
+        <div class = "col-6">
 
-            <button @onclick = "() => AddToCart(Products.product)" class = "btn btn-primary">Add To Cart</button>
+        @if (Products.product.Quantity > 0)
+        {
+
+            var cartitems = LocalStorage.GetItem<List<Product>>("cart");
+
+            var Citem = cartitems.Find(x => x.ProductID == @Products.product.ProductID);
+
+                if (Citem != null) { 
+                
+                    <div>
+
+                        <p>Item In Cart</p>
+
+                    </div>
+
+                }else if(Citem == null)
+                {
+                    
+                    <div>
+
+                        <button @onclick = "() => AddToCart(Products.product)" class = "btn btn-primary">Add To Cart</button>
+
+                    </div>
+
+                }
+
+        }
 
         </div>
 
@@ -113,7 +155,7 @@ else
 
 </AuthorizeView>
 
-
+</div>
 
 }
 
@@ -124,7 +166,7 @@ else
 
 
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
 
         await Products.GetProduct(Id);
@@ -142,15 +184,11 @@ else
 
         Cart.AddToCart(product);
 
+        Cart.OnProductChange += StateHasChanged;
+
+        InvokeAsync(StateHasChanged);
+
         ToastService.ShowSuccess(product.ProductName + " Has Been Added", "Added To Cart");
-
-    }
-
-    private async void AddCartToDB() {
-
-        var listcart = await LocalStorage.GetItemAsync<List<CartDTO>>("cart");
-
-        await Cart.AddCartToDB(listcart);
 
     }
 

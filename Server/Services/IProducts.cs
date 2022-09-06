@@ -1,4 +1,5 @@
 ﻿using ECommerceApp.Shared;
+using ECommerceApp.Shared.DTO;
 
 namespace ECommerceApp.Server.Services
 {
@@ -12,6 +13,10 @@ namespace ECommerceApp.Server.Services
         public Task<List<Product>> GetProducts();
 
         public Task<Product> GetProduct(int Id);
+
+        public Task UpdateQuantity(List<CartDTO> cart);
+
+        public Task<List<Product>> SearchProducts(string searchText);
 
     }
 }

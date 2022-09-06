@@ -4,8 +4,10 @@
 @using System.Linq
 @inject ECommerceApp.Client.Services.ICartController CartController
 @inject ECommerceApp.Client.Services.IMailController MailController
+@inject ECommerceApp.Client.Services.IProductsController ProductController
 @inject IToastService ToastService
 @inject ILocalStorageService LocalStorage
+@inject NavigationManager NavMan
 
 <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
 <link href="css/InputStyle.css" rel="stylesheet" />
@@ -35,29 +37,31 @@
 
         if (CartController.CartItems.Count > 0)
         {
-        @foreach (var cartitem in CartItems)
+        @foreach(var cartitem in CartItems)
         {
-        
+
+            int max = Products.Find(x => x.ProductID == cartitem.ProductID).Quantity;
+
             string ImgSrc = "Content/Images/" + cartitem.ProductName + ".jpg";
 
             <div class = "col-12">
 
                 <div class = "row">
 
-                    <div class = "col-3">
+                    <div class = "col-md-3">
 
                         <img src = "@ImgSrc" id = "ProductImg">
 
                     </div>
 
-                    <div class = "col float-start">
+                    <div class = "col float-start mx-4">
 
                         <h1 style = "font-size:30px;" id = "Product"> @cartitem.ProductName</h1>
                         <p class="price">Unit Price : R @cartitem.Price</p>
 
-                        <EditForm Model = "cartitem">
+                        <EditForm Model = "CartItems">
 
-                            <input id="Quantity" type="number" min = "1" @bind-value = "cartitem.Quantity">
+                            <input id="Quantity" type="number" min = "1" max = "@max" @bind-value = "cartitem.Quantity">
 
                         </EditForm>
 
@@ -140,7 +144,8 @@
 
 @code {
 
-    List<Product> CartItems = new List<Product>();
+    private List<Product> CartItems = new List<Product>();
+    private List<Product> Products = new List<Product>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -149,6 +154,21 @@
         await CartController.PopulateCart(cartitems);
 
         CartItems = CartController.CartItems;
+
+        List<ProductDTO> productdto = new List<ProductDTO>();
+
+        foreach (var item in CartItems) {
+
+            ProductDTO product = new ProductDTO();
+
+            product.ProductID = item.ProductID;
+            product.ProductName = item.ProductName;
+
+            productdto.Add(product);
+
+        }
+
+        Products = await CartController.GetProducts(productdto);
 
     }
 
@@ -189,9 +209,13 @@
 
         await MailController.SendMail(cartdto);
 
+        await ProductController.UpdateQuantity(cartdto);
+
         List<CartDTO> CartDTO = new List<CartDTO>();
 
         await LocalStorage.SetItemAsync("cart", CartDTO);
+
+        NavMan.NavigateTo("/CheckOut");
 
         ToastService.ShowSuccess("Email Sent");
 

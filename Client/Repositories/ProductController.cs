@@ -1,5 +1,6 @@
 ﻿using ECommerceApp.Client.Services;
 using ECommerceApp.Shared;
+using ECommerceApp.Shared.DTO;
 using System.Net.Http.Json;
 
 namespace ECommerceApp.Client.Repositories
@@ -7,6 +8,8 @@ namespace ECommerceApp.Client.Repositories
     public class ProductController : IProductsController
     {
         private readonly HttpClient _client;
+
+        
 
         public ProductController(HttpClient client)
         {
@@ -24,6 +27,8 @@ namespace ECommerceApp.Client.Repositories
                 var Products = await _client.GetFromJsonAsync<List<Product>>("api/Products");
 
                 products = Products;
+
+                
 
             }
             catch (Exception ex) { 
@@ -50,6 +55,36 @@ namespace ECommerceApp.Client.Repositories
             
             }
 
+        }
+
+        public async Task UpdateQuantity(List<CartDTO> cart)
+        {
+            try
+            {
+
+                await _client.PostAsJsonAsync("api/Products/UpdateQuantity", cart);
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);    
+            
+            }
+        }
+
+        public async Task<List<Product>> SearchProducts(string searchText)
+        {
+            try
+            {
+
+                return await _client.GetFromJsonAsync<List<Product>>($"api/Products/Search/{searchText}");
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
         }
 
     }

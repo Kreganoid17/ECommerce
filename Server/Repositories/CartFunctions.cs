@@ -13,28 +13,73 @@ namespace ECommerceApp.Server.Repositories
             _context = context;
         }
 
-        //Come Back to this to add cart details to db
-        public async Task AddCartToDB(List<CartDTO> cartdto)
+        public async Task AddCartToDB(CartDBDTO cart)
         {
 
-            for (int i = 0; i < cartdto.Count; i++)
-            {
+            try {
 
-                User user = _context.Users.SingleOrDefault(x => x.ID == cartdto[i].UserID);
+                char delim = ',';
 
-                Cart cart = new Cart();
+                List<CartDTO> cartdto = cart.cart;
 
-                cart.user = user;
+                var userid = cart.userid;
 
-                cart.CartItems = cartdto[i].ProductID.ToString();
+                var cartuser = _context.cart.SingleOrDefault(x => x.user.ID == userid);
 
-                cart.CartQauntity = cartdto[i].Quantity.ToString();
+                if (cartuser == null)
+                {
 
-                _context.cart.Add(cart);
+                    if (cartdto.Count > 0) {
 
-                await _context.SaveChangesAsync();
+                        User user = new User();
 
+                        user = _context.Users.SingleOrDefault(x => x.ID == userid);
+
+                        Cart cartobj = new Cart();
+
+                        cartobj.CartItems = String.Join(delim, cartdto.Select(x => x.ProductID));
+                        cartobj.CartQauntity = String.Join(delim, cartdto.Select(x => x.Quantity));
+                        cartobj.Price = String.Join(delim, cartdto.Select(x => x.Price));
+                        cartobj.user = user;
+
+                        _context.cart.Add(cartobj);
+
+                        _context.SaveChanges();
+
+                    }
+
+                }
+                else if (cartuser != null) {
+
+
+                    if (cartdto.Count > 0)
+                    {
+
+                        cartuser.CartItems = String.Join(delim, cartdto.Select(x => x.ProductID));
+                        cartuser.CartQauntity = String.Join(delim, cartdto.Select(x => x.Quantity));
+                        cartuser.Price = String.Join(delim, cartdto.Select(x => x.Price));
+
+                        _context.SaveChanges();
+
+                    }
+                    else if (cartdto.Count == 0) {
+
+                        _context.cart.Remove(cartuser);
+
+                        _context.SaveChanges();
+
+                    }
+
+
+                }
+               
+
+            }catch(Exception ex) {
+
+                throw new Exception(ex.Message);
+            
             }
+
 
         }
 
@@ -61,6 +106,97 @@ namespace ECommerceApp.Server.Repositories
                 }
 
                 await _context.SaveChangesAsync();
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
+
+        }
+
+        public async Task<List<Product>> GetProducts(List<ProductDTO> productdto)
+        {
+
+            try
+            {
+
+                List<Product> products = new List<Product>();   
+
+                foreach (var item in productdto) {
+
+                    var product = await _context.Products.FindAsync(item.ProductID);
+
+                    products.Add(product);
+
+                }
+
+
+                return products;
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);            
+            }
+
+        }
+
+        public async Task<List<CartDTO>> LoadCart(int userid)
+        {
+            try
+            {
+                var usercart = _context.cart.SingleOrDefault(x => x.user.ID == userid);
+
+                if (usercart == null)
+                {
+
+                    return new List<CartDTO>();
+
+                }
+                else {
+
+                    List<CartDTO> cartdto = new List<CartDTO>();
+
+                    List<int> products = usercart.CartItems.Split(',').ToList().ConvertAll(int.Parse);
+                    List<int> quantity = usercart.CartQauntity.Split(',').ToList().ConvertAll(int.Parse);
+
+                    List<Product> product = new List<Product>();
+
+                    for (int i = 0; i < products.Count; i++)
+                    {
+
+                        Product prod = new Product();
+
+                        var prd = _context.Products.SingleOrDefault(x => x.ProductID == products[i]);
+
+                        prod.ProductID = prd.ProductID;
+                        prod.ProductName = prd.ProductName;
+                        prod.Quantity = quantity[i];
+                        prod.Price = prd.Price;
+
+                        product.Add(prod);
+
+                    }
+
+                    for (int i = 0; i < product.Count; i++)
+                    {
+
+                        CartDTO Cartdto = new CartDTO();
+
+                        Cartdto.ProductID = product[i].ProductID;
+                        Cartdto.ProductName = product[i].ProductName;
+                        Cartdto.Quantity = product[i].Quantity;
+                        Cartdto.Price = product[i].Price;
+
+                        cartdto.Add(Cartdto);
+
+                    }
+
+                    return cartdto;
+
+                }
 
             }
             catch (Exception ex) {

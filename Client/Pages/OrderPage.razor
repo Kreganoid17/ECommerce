@@ -1,0 +1,99 @@
+﻿@page "/Orders"
+@using ECommerceApp.Shared.DTO
+@inject ECommerceApp.Client.Services.IOrderController OrderController
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavMan
+
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
+<link href="css/Loading.css" rel="stylesheet" />
+
+<h3 class = "text-center">Order History</h3>
+<br>
+
+<div>
+
+    @if (orders == null)
+    {
+
+        <div id="circle">
+                <div class="loader">
+                    <div class="loader">
+                        <div class="loader">
+                            <div class="loader">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+    }
+
+    else if (orders != null)
+    {
+        
+        if (orders.Count <= 0)
+        {
+
+            <p>no orders placed</p> 
+
+        }
+        else if (orders.Count > 0)
+        {
+
+            <table class="table text-center">
+                    <thead class="thead-dark">
+                         <tr>
+                             <th scope="col">Order No.</th>
+                             <th scope="col">Products</th>
+                             <th scope="col">Date Purchased</th>
+                             <th scope="col">Properties</th>
+                        </tr>
+                    </thead>
+        
+            @foreach(var order in orders)
+            {
+        
+                
+                    <tbody>
+                        <tr>
+                            <th scope="row">@order.orderno</th>
+                                <td>@order.orderproducts</td>
+                                <td>@order.orderdate</td>
+                                <td><button class = "btn-link btn-primary" @onclick = "() => GoToDetailsPage(order.ID)">View</button></td>
+                        </tr>
+    
+                    </tbody>
+                
+
+            }
+
+            </table>
+
+        }
+
+    }
+
+</div>
+
+@code {
+
+    List<OrderDTO> orders = new List<OrderDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var user = await LocalStorage.GetItemAsync<AuthDTO>("User");
+
+        var Orders = await OrderController.GetOrders(user.UserID);
+
+        orders = Orders;
+
+    }
+
+    private void GoToDetailsPage(int Id) {
+
+        NavMan.NavigateTo($"/OrderDetails/{Id}");
+
+    }
+
+}

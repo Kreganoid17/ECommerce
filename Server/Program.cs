@@ -20,6 +20,7 @@ builder.Services.AddScoped<IProducts, Products>();
 builder.Services.AddScoped<ILoginUser, LoginUser>();
 builder.Services.AddScoped<ICart, CartFunctions>();
 builder.Services.AddScoped<IMail, Mail>();
+builder.Services.AddScoped<IOrder, OrderFunctions>();
 
 
 var app = builder.Build();

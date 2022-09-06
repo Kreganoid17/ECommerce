@@ -8,7 +8,11 @@ namespace ECommerceApp.Server.Services
 
         Task AddToCart(Cart cart);
 
-        Task AddCartToDB(List<CartDTO> cartdto);
+        Task AddCartToDB(CartDBDTO cart);
+
+        Task<List<CartDTO>> LoadCart(int userid);
+
+        Task<List<Product>> GetProducts(List<ProductDTO> productdto);
 
 
     }

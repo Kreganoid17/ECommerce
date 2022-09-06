@@ -1,7 +1,12 @@
-﻿@using ECommerceApp.Shared.DTO
+﻿@using ECommerceApp.Shared
+@using ECommerceApp.Shared.DTO
 @inherits LayoutComponentBase
+@implements IDisposable
 @inject ISyncLocalStorageService LocalStorage
+@inject ECommerceApp.Client.Services.ICartController CartController
+@inject ECommerceApp.Client.Services.IProductsController ProductController
 @inject NavigationManager NavMan
+    
 
 <div class="page">
     <div class="sidebar">
@@ -9,20 +14,68 @@
     </div>
 
     <main>
-    
-        <div class="top-row px-4">
+
+        <div class = "col-12">
+
+            <div class = "row">
+
             <AuthorizeView>
 
                 <Authorized>
 
-                    <button class = "btn btn-primary" @onclick = "GoToCartPage">Cart</button>
+                    <div class="col-10 p-2" >
+
+                    @{AuthDTO username = LocalStorage.GetItem<AuthDTO>("User");}
+
+                    <div class = "text-center">
+
+                        <h1>Welcome Back @username.Username To The Gaming Corner!</h1>
+
+                    </div>
+
+                    </div>
+
+                    <div class="col">
+
+                    <div class = "p-2">
+
+                    <button class = "btn btn-primary p-2" @onclick = "GoToCartPage">
+                        
+                        <i class = "oi oi-cart mx-1"></i> Cart
+
+                        <span class = "badge badge-pill badge-light mx-1">@GetCartCount()</span>
+                    
+                    </button>
+
+                    </div>
+
+                    </div>
 
                 </Authorized>
 
-            </AuthorizeView>
+                <NotAuthorized>
+
+                    <div class="col p-2">
+
+                    <div class = "text-center">
+
+                        <h1>Welcome To The Shop!</h1>
+
+                    </div>
+                    
+                </div>
+
+                </NotAuthorized>
+
+               </AuthorizeView>
+
+        
+
         </div>
 
-        <article class="content px-4">
+        </div>
+
+        <article class="content">
             @Body
         </article>
     </main>
@@ -30,6 +83,21 @@
 <BlazoredToasts/>
 
 @code{
+    
+
+    protected override void OnInitialized()
+    {
+
+        CartController.OnCartChange += StateHasChanged;
+
+    }
+
+    public void Dispose()
+    {
+
+        CartController.OnCartChange -= StateHasChanged;
+
+    }
 
     private void GoToCartPage()
     {
@@ -37,6 +105,29 @@
         NavMan.NavigateTo("/Cart");
 
     }
+
+    private int GetCartCount()
+    {
+
+        var cart = LocalStorage.GetItem<List<Product>>("cart");
+
+        if (cart == null)
+        {
+
+            return 0;
+
+        }
+        else if (cart != null) { 
+
+            return cart.Count;
+
+        }
+
+        return 0;
+
+    }
+
+
 
 }
 

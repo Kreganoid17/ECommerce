@@ -1,10 +1,14 @@
-﻿@inject ILocalStorageService LocalStorage
+﻿@using ECommerceApp.Client.Services
+@using ECommerceApp.Shared
+@using ECommerceApp.Shared.DTO
+@inject ILocalStorageService LocalStorage
+@inject ICartController CartController
 @inject AuthenticationStateProvider AuthStateProvider
 
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">The Shop</a>
+        <a class="navbar-brand" href="">The Gaming Corner</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -28,7 +32,7 @@
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="ProductPage">
-                <span class="oi oi-book" aria-hidden="true"></span> Products
+                <span class="oi oi-box" aria-hidden="true"></span> Products
             </NavLink>
         </div>
         <div class="nav-item px-3">
@@ -43,6 +47,10 @@
                 </NotAuthorized>
 
                 <Authorized>
+
+                    <NavLink class="nav-link"  href="Orders">
+                        <span class="oi oi-timer" aria-hidden="true" ></span> Orders
+                    </NavLink>
 
                     <NavLink class="nav-link" @onclick="LogOut" href="login">
                         <span class="oi oi-account-logout" aria-hidden="true" ></span> Log Out
@@ -68,8 +76,15 @@
 
     private async void LogOut()
     {
+        CartDBDTO cart = new CartDBDTO();
 
+        cart.cart = await LocalStorage.GetItemAsync<List<CartDTO>>("cart");
 
+        var userid = await LocalStorage.GetItemAsync<AuthDTO>("User");
+
+        cart.userid = userid.UserID;
+
+        await CartController.AddCartToDB(cart);
 
         await LocalStorage.RemoveItemAsync("User");
         await LocalStorage.RemoveItemAsync("cart");

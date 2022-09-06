@@ -1,5 +1,6 @@
 ﻿using ECommerceApp.Server.Services;
 using ECommerceApp.Shared;
+using ECommerceApp.Shared.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceApp.Server.Repositories
@@ -56,5 +57,45 @@ namespace ECommerceApp.Server.Repositories
             }
         }
 
+        public async Task UpdateQuantity(List<CartDTO> cart)
+        {
+            try
+            {
+
+                foreach (var item in cart)
+                {
+
+                    var product = await _context.Products.FindAsync(item.ProductID);
+
+                    product.Quantity -= item.Quantity;
+
+                    await _context.SaveChangesAsync();
+
+                }
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
+        }
+
+        public async Task<List<Product>> SearchProducts(string searchText)
+        {
+            try
+            {
+
+                return await _context.Products
+                .Where(p => p.ProductName.Contains(searchText) || p.Description.Contains(searchText))
+                .ToListAsync();
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
+        }
     }
 }

@@ -25,5 +25,6 @@ builder.Services.AddScoped<IProductsController, ProductController>();
 builder.Services.AddScoped<ILoginUserController, LoginUserController>();
 builder.Services.AddScoped<ICartController, CartController>();
 builder.Services.AddScoped<IMailController, MailController>();
+builder.Services.AddScoped<IOrderController, OrderController>();
 
 await builder.Build().RunAsync();

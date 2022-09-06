@@ -11,6 +11,9 @@ namespace ECommerceApp.Client.Repositories
         private readonly HttpClient _client;
         private readonly ILocalStorageService _localstorage;
 
+        public event Action OnCartChange;
+        public event Action OnProductChange;
+
         public CartController(HttpClient client, ILocalStorageService localstorage)
         {
 
@@ -21,13 +24,13 @@ namespace ECommerceApp.Client.Repositories
 
         public List<Product> CartItems { get; set; }
 
-        public async Task AddCartToDB(List<CartDTO> cartdto)
+        public async Task AddCartToDB(CartDBDTO cart)
         {
 
             try
             {
 
-                await _client.PostAsJsonAsync("api/Cart/AddCartToDB", cartdto);
+                await _client.PostAsJsonAsync("api/Cart/AddCartToDB", cart);
 
             }
             catch (Exception ex)
@@ -68,6 +71,9 @@ namespace ECommerceApp.Client.Repositories
                     cart.Add(newCart);
                     await _localstorage.SetItemAsync("cart", cart);
 
+                    OnCartChange.Invoke();
+                    OnProductChange.Invoke();
+
                 }
 
             }
@@ -98,6 +104,8 @@ namespace ECommerceApp.Client.Repositories
                     cart.Remove(cartitem);
 
                     await _localstorage.SetItemAsync("cart", cart);
+
+                    OnCartChange.Invoke();
 
                 }
 
@@ -148,6 +156,54 @@ namespace ECommerceApp.Client.Repositories
             }
         
         }
-        
+
+        public async Task<List<CartDTO>> LoadCart(int userid) {
+
+            var item = await _client.GetFromJsonAsync<List<CartDTO>>($"api/Cart/LoadCart/{userid}");
+
+            List<Product> products = new List<Product>();
+
+            foreach (var cartitem in item)
+            {
+
+                if (item != null)
+                {
+
+                    Product product = new Product();
+
+                    product.ProductID = cartitem.ProductID;
+                    product.ProductName = cartitem.ProductName;
+                    product.Price = cartitem.Price;
+                    product.Quantity = cartitem.Quantity;
+
+                    products.Add(product);
+
+                }
+
+            }
+
+            CartItems = products;
+
+            return item;
+
+        }
+
+        public async Task<List<Product>> GetProducts(List<ProductDTO> productdto)
+        {
+            try
+            {
+
+                var call = await _client.PostAsJsonAsync("api/Cart/Quantity", productdto);
+                var products = await call.Content.ReadFromJsonAsync<List<Product>>();
+
+                return products;
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
+        }
     }
 }

@@ -1,8 +1,8 @@
 ﻿.card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     flex : 1;
-    height: 529px;
-    margin: auto;
+    width: 100%;
+    height: 55vh;
     text-align: center;
     font-family: arial;
 }
@@ -54,4 +54,12 @@
     color:#ffffff;
     background-color: black;
 
+}
+
+#OutOfStock {
+    position: absolute;
+    bottom: 0px;
+    height: 50px;
+    color: #ffffff;
+    background-color: red;
 }

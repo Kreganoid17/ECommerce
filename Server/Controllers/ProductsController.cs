@@ -1,5 +1,6 @@
 ﻿using ECommerceApp.Server.Services;
 using ECommerceApp.Shared;
+using ECommerceApp.Shared.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,6 +54,39 @@ namespace ECommerceApp.Server.Controllers
             
             }
 
+        }
+
+        [HttpPost("UpdateQuantity")]
+        public async Task UpdateQuantity(List<CartDTO> cart) {
+
+            try
+            {
+
+                await _products.UpdateQuantity(cart);
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            
+            }
+        
+        }
+
+        [HttpGet("Search/{searchText}")]
+        public async Task<ActionResult<List<Product>>> SearchProducts(string searchText)
+        {
+            try
+            {
+
+                return await _products.SearchProducts(searchText);
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+
+            }
         }
 
     }

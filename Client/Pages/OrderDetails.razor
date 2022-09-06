@@ -1,0 +1,148 @@
+﻿@page "/OrderDetails/{Id:int}"
+@inject IToastService ToastService
+@inject NavigationManager NavMan
+@using ECommerceApp.Shared.DTO
+@inject ECommerceApp.Client.Services.IOrderController OrderController
+
+<link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
+<link href="css/Loading.css" rel="stylesheet" />
+
+<h2 class = "text-center">Order Details</h2>
+
+<br>
+
+@if(oddto == null)
+{
+
+    <div id="circle">
+                <div class="loader">
+                    <div class="loader">
+                        <div class="loader">
+                            <div class="loader">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+
+}
+else
+{
+
+    if(oddto.orderproducts == null){
+    
+        <div id="circle">
+                <div class="loader">
+                    <div class="loader">
+                        <div class="loader">
+                            <div class="loader">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+    
+    }else if(oddto.orderproducts != null){
+    
+        <div>
+
+    <div class = "col">
+
+        <div class = "row">
+
+            <div class = "col-6">
+
+                <h3>Order Number: @oddto.orderno</h3>
+
+            </div>
+
+             <div class = "col-6">
+                
+                <div class = "float-end">
+
+                    <h3>Date Purchased: @oddto.orderdate</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <table class="table text-center">
+                    <thead class="thead-dark">
+                         <tr style = "background-color:lightgray;">
+                             <th scope="col">Products</th>
+                             <th scope="col">Quantity</th>
+                             <th scope="col">Price</th>
+                        </tr>
+                    </thead>
+
+    @for(int i = 0; i < oddto.orderproducts.Count(); i++){
+    
+        <tbody>
+           <tr>
+                <td>@oddto.orderproducts[i]</td>
+                <td>@oddto.quantities[i]</td>
+                <td>R @oddto.prices[i]</td>
+            </tr>
+    
+        </tbody>
+        
+    
+    }
+
+    <tr style = "background-color:lightgrey; font-weight:bold;">
+
+            @{
+                float total = 0;
+
+                for (int i = 0; i < oddto.orderproducts.Count; i++)
+                {
+
+                    total = total + (oddto.prices[i] * oddto.quantities[i]);
+
+                }
+
+           }
+
+        <td>Total:</td>
+        <td></td>
+        <td>R @total</td>
+
+    </tr>
+
+    </table>
+
+</div>
+    
+    }
+
+<button class = "btn btn-primary" @onclick = "GoBack" >back</button>
+
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private OrderDetailsDTO oddto = new OrderDetailsDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        oddto = await OrderController.GetOrder(Id);
+
+    }
+
+    private void GoBack() {
+
+        NavMan.NavigateTo("/Orders");
+
+    }
+
+}

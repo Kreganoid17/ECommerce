@@ -12,6 +12,9 @@ namespace ECommerceApp.Shared
 
         [Key]
         public int ID { get; set; }
+
+        public string OrderNo { get; set; }
+
         public User Userid { get; set; }
 
         public string Products { get; set; }

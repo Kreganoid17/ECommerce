@@ -1,4 +1,5 @@
-﻿@page "/ProductPage"
+﻿@page "/"
+@page "/ProductPage"
 @using ECommerceApp.Shared
 @using ECommerceApp.Shared.DTO
 @inject ECommerceApp.Client.Services.IProductsController Products
@@ -12,6 +13,40 @@
 <link href = "css/CardStyle.css" rel = "stylesheet" >
 <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
 <link href="css/Loading.css" rel="stylesheet" />
+
+<div class = "col-12">
+
+    <div class = "row">
+
+        <div class = " col-10 w-100 p-2 text-center">
+
+            <BlazoredTypeahead SearchMethod="@SearchProduct" TValue = "Product" TItem= "Product" Value = "SelectedProduct" ValueChanged = "HandleSearch" ValueExpression = "(() => SelectedProduct)" placeholder = "Search...">
+
+                <SelectedTemplate>
+
+                    @context.ProductName
+
+                </SelectedTemplate>
+                <ResultTemplate>
+
+                    @context.ProductName
+
+                </ResultTemplate>
+                <NotFoundTemplate>
+
+                    Sorry this product doesn't exist.
+
+                </NotFoundTemplate>
+
+            </BlazoredTypeahead>
+
+        </div>
+
+    </div>
+
+</div>
+
+<br>
 
 @if (Products.products == null)
 {
@@ -30,33 +65,7 @@
 
 }else{
 
-    <AuthorizeView>
-
-        <NotAuthorized>
-
-            <div class = "text-center">
-
-                <h1>Welcome To The Shop!</h1>
-
-            </div>
-            <br>
-
-        </NotAuthorized>
-
-        <Authorized>
-
-            @{AuthDTO username = LocalStorage.GetItem<AuthDTO>("User");}
-
-            <div class = "text-center">
-
-            <h1>Welcome Back @username.Username To The Shop!</h1>
-
-            </div>
-            <br>
-
-        </Authorized>
-
-    </AuthorizeView>
+    
 
 
         <div class = "col-12">
@@ -65,13 +74,15 @@
 
             @foreach(var product in Products.products)
             {
-                <div class = "col-3">
+                <div class = "col-md-3 col-sm-6">
 
-                    <div class="card w-100 mb-3">
+                    <div class="card mb-3">
 
                         @{string ImgSrc = "Content/Images/" + product.ProductName + ".jpg";}
 
-                        <img src = "@ImgSrc" @onclick = "() => ShowDetails(product.ProductID)" id = "ProductImg">
+                            <img src = "@ImgSrc" @onclick = "() => ShowDetails(product.ProductID)" id = "ProductImg">
+
+
                         <h1 style = "font-size:30px;" @onclick = "() => ShowDetails(product.ProductID)" id = "Product"> @product.ProductName</h1>
                         <p class="price">R @product.Price</p>
 
@@ -79,15 +90,56 @@
 
                             <Authorized>
 
-                                <div class = "w-100" @onclick = "() => AddToCart(product)" id = "AddToCart">
+                                @if(product.Quantity > 0){
 
-                                    <div style = "top:50%;">
+                                    var cartitems = LocalStorage.GetItem<List<Product>>("cart");
 
-                                        Add to Cart
+                                    var Citem = cartitems.Find(x => x.ProductID == product.ProductID);
+
+
+                                    if (Citem != null) {
+
+
+                                            <div class = "w-100" id = "AddToCart">
+
+                                                <div style = "top:50%;">
+
+                                                    In Cart
+
+                                                </div>
+
+                                            </div>
+
+
+                                        }else if(Citem == null)
+                                        {
+                                        
+                                            <div class = "w-100" @onclick = "() => AddToCart(product)" id = "AddToCart">
+
+                                                <div style = "top:50%;">
+
+                                                    Add to Cart
+
+                                                </div>
+
+                                            </div>
+
+                                        }
+
+                                }else if(product.Quantity <= 0){
+                                
+                                    <div class = "w-100" id = "OutOfStock">
+
+                                        <div style = "top:50%;">
+
+                                            Out of Stock
+
+                                        </div>
 
                                     </div>
+                                
+                                }
 
-                                </div>
 
                             </Authorized>
 
@@ -109,9 +161,12 @@
 
 @code {
 
+    private Product SelectedProduct;
+
     protected override async Task OnInitializedAsync()
     {
         await Products.GetProducts();
+
 
     }
 
@@ -125,7 +180,27 @@
 
         Cart.AddToCart(product);
 
+        Cart.OnProductChange += StateHasChanged;
+
+        InvokeAsync(StateHasChanged);
+
         ToastService.ShowSuccess(product.ProductName + " Has Been Added", "Added To Cart");
+
+    }
+
+        private void HandleSearch(Product product) {
+
+        if (product == null) return;
+        SelectedProduct = product;
+        NavMan.NavigateTo($"/ProductDetails/{SelectedProduct.ProductID}");
+
+    }
+
+    private async Task<IEnumerable<Product>> SearchProduct(string searchtext)
+    {
+
+        var call = await Products.SearchProducts(searchtext);
+        return call;
 
     }
 

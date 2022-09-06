@@ -19,7 +19,8 @@ namespace ECommerceApp.Server.Controllers
         }
 
         [HttpPost("AddToCart")]
-        public async Task AddToCart(Cart cart) {
+        public async Task AddToCart(Cart cart)
+        {
 
             try
             {
@@ -27,33 +28,36 @@ namespace ECommerceApp.Server.Controllers
                 await _cart.AddToCart(cart);
 
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
 
                 throw new Exception(ex.Message);
 
             }
-        
+
         }
 
         [HttpPost("AddCartToDB")]
-        public async Task AddCartToDB(List<CartDTO> carddto)
+        public async Task AddCartToDB(CartDBDTO cart)
         {
             try
             {
 
-                await _cart.AddCartToDB(carddto);
+                await _cart.AddCartToDB(cart);
 
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
 
                 throw new Exception(ex.Message);
-            
+
             }
-        
+
         }
 
         [HttpGet("{Id}")]
-        public Task<Product> GetProduct(int Id) {
+        public Task<Product> GetProduct(int Id)
+        {
 
             try
             {
@@ -63,13 +67,55 @@ namespace ECommerceApp.Server.Controllers
                 return product;
 
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
 
                 throw new Exception(ex.Message);
-            
+
             }
-        
+
+        }
+
+        [HttpGet("LoadCart/{userid}")]
+        public Task<List<CartDTO>> LoadCart(int userid)
+        {
+
+            try
+            {
+
+                var cartdto = _cart.LoadCart(userid);
+
+                return cartdto;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+
+            }
+
+
+        }
+
+        [HttpPost("Quantity")]
+        public async Task<List<Product>> Quantity(List<ProductDTO> productdto)
+        {
+            try
+            {
+
+                return await _cart.GetProducts(productdto);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+
+            }
+
         }
 
     }
+
 }

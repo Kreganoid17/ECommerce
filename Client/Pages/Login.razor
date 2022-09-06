@@ -4,6 +4,7 @@
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavMan
 @inject ECommerceApp.Client.Services.ILoginUserController LoginUserController
+@inject ECommerceApp.Client.Services.ICartController CartController
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IToastService ToastService
 @inject HttpClient client
@@ -54,11 +55,15 @@
         if (isvalid == true)
         {
 
+            var userid = await LocalStorage.GetItemAsync<AuthDTO>("User");
+
+            var cart = await CartController.LoadCart(userid.UserID);
+
             await AuthStateProvider.GetAuthenticationStateAsync();
 
-            NavMan.NavigateTo("/ProductPage");
+            await LocalStorage.SetItemAsync("cart", cart);
 
-            await LocalStorage.SetItemAsync("cart", new List<CartDTO>());
+            NavMan.NavigateTo("/ProductPage");
 
         }
         else if(isvalid == false)

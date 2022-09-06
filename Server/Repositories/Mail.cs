@@ -20,9 +20,17 @@ namespace ECommerceApp.Server.Repositories
             try
             {
 
-                AddOrder(cartdto); 
+                string OrderNo = AddOrder(cartdto); 
 
                 SmtpClient smtp = new SmtpClient();
+
+                string useremail = "";
+
+                for (int i = cartdto.Count - 1; i < cartdto.Count; i++) {
+
+                     useremail = UserEmail(cartdto[i].UserID);
+
+                }
 
                 smtp.Host = "smtp.gmail.com";
                 smtp.EnableSsl = true;
@@ -32,7 +40,7 @@ namespace ECommerceApp.Server.Repositories
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtp.Port = 25;
 
-                MailMessage mm = new MailMessage("chettykubeshan0@gmail.com", "chettykubeshan1999@gmail.com");
+                MailMessage mm = new MailMessage("chettykubeshan0@gmail.com", useremail);
 
                 float total = 0;
 
@@ -50,7 +58,7 @@ namespace ECommerceApp.Server.Repositories
 
                 textbody += "Grand Total: R" + total.ToString();
 
-                mm.Subject = "Order Placed";
+                mm.Subject = "Order Placed. Your Order Number Is: " + OrderNo;
                 mm.Body = textbody;
                 mm.IsBodyHtml = true;
 
@@ -70,7 +78,7 @@ namespace ECommerceApp.Server.Repositories
 
         }
 
-        void AddOrder(List<CartDTO> cartdto) {
+        string AddOrder(List<CartDTO> cartdto) {
 
             try
             {
@@ -91,6 +99,11 @@ namespace ECommerceApp.Server.Repositories
 
                 user = _context.Users.Find(UserID);
 
+                Random r = new Random();
+                int randNum = r.Next(1000000);
+                string OrderNo = randNum.ToString("D6");
+
+                order.OrderNo = OrderNo;
                 order.Products = String.Join(delim, cartdto.Select(x => x.ProductID));
                 order.Quantities = String.Join(delim, cartdto.Select(x => x.Quantity));
                 order.Prices = String.Join(delim, cartdto.Select(x => x.Price * x.Quantity));
@@ -101,11 +114,29 @@ namespace ECommerceApp.Server.Repositories
 
                 _context.SaveChanges();
 
+                return OrderNo;
+
             }
             catch (Exception ex) {
 
                 throw new Exception(ex.Message);
             
+            }
+        
+        }
+
+        private string UserEmail(int userid) {
+
+            try
+            {
+
+                return _context.Users.Find(userid).Email;
+
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+                
             }
         
         }
