@@ -1,6 +1,8 @@
 ﻿using ECommerceApp.Server.Services;
 using ECommerceApp.Shared;
 using ECommerceApp.Shared.DTO;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceApp.Server.Repositories
 {
@@ -155,7 +157,8 @@ namespace ECommerceApp.Server.Repositories
                     return new List<CartDTO>();
 
                 }
-                else {
+                else
+                {
 
                     List<CartDTO> cartdto = new List<CartDTO>();
 
@@ -199,10 +202,11 @@ namespace ECommerceApp.Server.Repositories
                 }
 
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
 
                 throw new Exception(ex.Message);
-            
+
             }
 
         }

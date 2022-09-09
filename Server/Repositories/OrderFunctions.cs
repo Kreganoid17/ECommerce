@@ -1,6 +1,8 @@
 ﻿using ECommerceApp.Server.Services;
 using ECommerceApp.Shared;
 using ECommerceApp.Shared.DTO;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceApp.Server.Repositories
 {
@@ -23,7 +25,9 @@ namespace ECommerceApp.Server.Repositories
 
                 List<OrderDTO> result = new List<OrderDTO>();
 
-                var orders = _context.orders.Where(x => x.Userid.ID == userid).ToList();
+                SqlParameter Userid = new SqlParameter("@userid", userid);
+
+                var orders = _context.orders.FromSqlRaw("dbo.GetOrders @userid", Userid).AsEnumerable().ToList();
 
                 foreach (var order in orders)
                 {
@@ -78,7 +82,9 @@ namespace ECommerceApp.Server.Repositories
 
                 List<string> orderproducts = new List<string>();
 
-                var order = _context.orders.Where(x => x.ID == orderid).ToList();
+                SqlParameter Orderid = new SqlParameter("@orderid", orderid);
+
+                var order = _context.orders.FromSqlRaw("dbo.GetOrder @orderid", Orderid).AsEnumerable().ToList();
 
                 foreach (var item in order) {
 

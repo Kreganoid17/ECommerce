@@ -1,6 +1,7 @@
 ﻿using ECommerceApp.Server.Services;
 using ECommerceApp.Shared;
 using ECommerceApp.Shared.DTO;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 
@@ -26,7 +27,9 @@ namespace ECommerceApp.Server.Repositories
             try
             {
 
-                var userexists = _context.Users.SingleOrDefault(x => x.Email == userdto.Email);
+                SqlParameter email = new SqlParameter("@email", userdto.Email);
+
+                var userexists = _context.Users.FromSqlRaw("dbo.GetUser @email",email).AsEnumerable().FirstOrDefault();
 
                 if (userexists == null)
                 {
@@ -93,7 +96,7 @@ namespace ECommerceApp.Server.Repositories
             try
             {
 
-                var Users = await _context.Users.ToListAsync();
+                var Users = _context.Users.FromSqlRaw("dbo.GetUsers").AsEnumerable().ToList();
 
                 users = Users;
 

@@ -43,7 +43,7 @@ namespace ECommerceApp.Server.Repositories
             try
             {
 
-                var Products = await _context.Products.ToListAsync();
+                var Products = await _context.Products.FromSqlRaw("dbo.GetProducts").ToListAsync();
 
                 products = Products;
 
